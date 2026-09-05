@@ -1,5 +1,7 @@
 """Authentication workflows — positive, negative, and session teardown."""
 
+import re
+
 import pytest
 from playwright.sync_api import expect
 

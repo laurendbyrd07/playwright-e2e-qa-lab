@@ -29,6 +29,8 @@ def cart_with_two_items(auth_page):
 
 
 def test_checkout_form_validates_each_required_field(cart_with_two_items):
+    # navigate from the cart to checkout step one first
+    cart_with_two_items.checkout()
     checkout = CheckoutStepOne(cart_with_two_items.page)
 
     # submit completely empty — first error names the first missing field

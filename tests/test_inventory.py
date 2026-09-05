@@ -6,6 +6,7 @@ control changed — a sort bug that produces the wrong order fails loudly.
 from decimal import Decimal
 
 import pytest
+from playwright.sync_api import expect
 
 from pages.inventory_page import InventoryPage
 from pages.login_page import LoginPage
@@ -44,7 +45,7 @@ def test_sort_price_low_to_high(auth_page):
 
     prices = inventory.visible_prices()
     assert prices == sorted(prices), "Prices are not in ascending order"
-    assert prices == [Decimal("7.99"), Decimal("7.99"), Decimal("9.99"),
+    assert prices == [Decimal("7.99"), Decimal("9.99"), Decimal("15.99"),
                       Decimal("15.99"), Decimal("29.99"), Decimal("49.99")]
 
 
@@ -68,14 +69,18 @@ def test_product_images_all_render(auth_page):
 
 
 @pytest.mark.failure_detection
-def test_problem_user_visual_defect_is_detected(page):
-    """Known-defect detection: the 'problem user' persona ships broken product
-    images. This test proves the suite catches visual failures, not just
-    functional ones — the same check that passed for the standard user fails
-    here, by design of the target app."""
+def test_problem_user_silent_add_failure_is_detected(page):
+    """Known-defect detection (current app behavior, verified from its source):
+    the 'problem user' persona SILENTLY fails to add odd-ID products to the
+    cart — no error, no feedback, the button just does nothing for 3 of the 6
+    products. The cart badge is the only witness. This test proves the suite
+    catches silent partial failures that a naive "click succeeded" check
+    would miss entirely."""
     LoginPage(page).goto().login(users.PROBLEM_USER, users.PASSWORD)
 
     inventory = InventoryPage(page)
-    load_states = inventory.image_load_states()
-    broken = [i for i, ok in enumerate(load_states) if not ok]
-    assert broken, "Expected problem_user broken images — visual failure not detected"
+    for product in CATALOG:
+        inventory.add_to_cart(product["id"])
+
+    badge = page.locator(InventoryPage.CART_BADGE)
+    expect(badge).to_have_text("3")

@@ -17,7 +17,7 @@ class InventoryPage(BasePage):
     SORT = '[data-test="product-sort-container"]'
     CART_BADGE = ".shopping_cart_badge"
     CART_LINK = ".shopping_cart_link"
-    BURGER = "#react-burger-menu-button"
+    BURGER = "#react-burger-menu-btn"
     LOGOUT = "#logout_sidebar_link"
 
     def add_to_cart(self, product_id: str) -> "InventoryPage":

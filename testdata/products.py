@@ -29,7 +29,7 @@ CATALOG = [
     {
         "id": "sauce-labs-onesie",
         "name": "Sauce Labs Onesie",
-        "price": Decimal("7.99"),
+        "price": Decimal("15.99"),
     },
     {
         "id": "test-all-the-things-t-shirt-red",

@@ -40,7 +40,10 @@ def test_logout_ends_the_session(page):
     # back at the login screen...
     expect(page.locator('[data-test="login-button"]')).to_be_visible()
     # ...and the session is truly gone: direct navigation to the protected
-    # page bounces back to login rather than showing inventory content.
+    # page bounces back to login. The SPA's auth check runs client-side, so
+    # the redirect timing varies per engine — poll for the redirect instead
+    # of asserting the URL synchronously (webkit checks auth slightly later
+    # than chromium/firefox).
     page.goto(f"{config.BASE_URL}/inventory.html")
-    assert "/inventory.html" not in page.url, "Session survived logout — protected page reachable"
+    expect(page).not_to_have_url(re.compile(r".*/inventory\.html"))
     expect(page.locator('[data-test="login-button"]')).to_be_visible()

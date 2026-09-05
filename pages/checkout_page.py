@@ -16,7 +16,8 @@ class CheckoutStepOne(BasePage):
     CONTINUE = '[data-test="continue"]'
     ERROR = '[data-test="error"]'
 
-    def fill(self, first: str, last: str, postal: str) -> "CheckoutStepOne":
+    def fill(self, first: str | None = None, last: str | None = None,
+             postal: str | None = None) -> "CheckoutStepOne":
         if first is not None:
             self.page.fill(self.FIRST_NAME, first)
         if last is not None:

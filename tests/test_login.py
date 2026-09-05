@@ -3,6 +3,7 @@
 import pytest
 from playwright.sync_api import expect
 
+import config
 from pages.inventory_page import InventoryPage
 from pages.login_page import LoginPage
 from testdata import users
@@ -40,6 +41,6 @@ def test_logout_ends_the_session(page):
     expect(page.locator('[data-test="login-button"]')).to_be_visible()
     # ...and the session is truly gone: direct navigation to the protected
     # page bounces back to login rather than showing inventory content.
-    page.goto("/inventory.html")
+    page.goto(f"{config.BASE_URL}/inventory.html")
     assert "/inventory.html" not in page.url, "Session survived logout — protected page reachable"
     expect(page.locator('[data-test="login-button"]')).to_be_visible()

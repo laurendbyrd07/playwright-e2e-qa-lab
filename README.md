@@ -15,7 +15,7 @@ This lab represents **active skill-building in modern UI/E2E automation** — po
 
 Playwright's design changes what a suite *is*: auto-waiting removes hand-rolled wait management, the storage-state pattern makes authentication reusable, traces make failures debuggable after the fact, and one CLI flag runs the same suite across three browser engines.
 
-SauceDemo is chosen over a throwaway login demo because it has **real multi-step workflows** (browse → cart → checkout → confirmation), **stateful behavior** (cart badge, cart contents across pages), **financial calculations** worth verifying from first principles, and **built-in failure personas** — including a `problem_user` with visually broken pages — which let the suite demonstrate *failure detection*, not just happy paths.
+SauceDemo is chosen over a throwaway login demo because it has **real multi-step workflows** (browse → cart → checkout → confirmation), **stateful behavior** (cart badge, cart contents across pages), **financial calculations** worth verifying from first principles, and **built-in failure personas** — including a `problem_user` whose add-to-cart silently fails for some products — which let the suite demonstrate *failure detection*, not just happy paths.
 
 ## Architecture
 
@@ -34,7 +34,7 @@ playwright-e2e-qa-lab/
 - **Storage-state authentication.** Login happens **once per session** (`conftest.py`); the cookie/localStorage state is saved and injected into a fresh context per test. Fast *and* isolated — cart contents can't leak between tests.
 - **Auto-waiting as the wait strategy.** No explicit waits anywhere; Playwright's locator engine plus `expect()` polling is the strategy. (Contrast: TestMate manages waits explicitly, because Selenium requires it — knowing *why* they differ is the point of building both.)
 - **Data-backed assertions.** Sorting tests assert the actual price/name *sequences* against the expected catalog — not just "the dropdown changed." The checkout test recalculates subtotal/tax/total from displayed line items with `Decimal` math.
-- **Failure-detection test.** `problem_user` (a persona with broken images) is used to prove the visual check catches real failures — the same assertion that passes for the standard user fails here, by the target app's design.
+- **Failure-detection test.** `problem_user` silently fails to add 3 of the 6 products to the cart — no error, the button just does nothing. The test clicks all 6 and asserts the cart badge reads `3`, proving the suite catches silent partial failures that a naive "the click succeeded" check would miss.
 - **Stable selectors.** `[data-test=...]` attributes exclusively — never generated CSS or text-matching where an attribute exists.
 - **Test data separation.** Personas and the expected catalog live in `testdata/`, so app changes are one-file updates.
 
